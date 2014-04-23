@@ -17,8 +17,7 @@ Free for Commercial and Non-commercial use.
 1. Copy the GEKit folder to the same folder as your .blend file.
 2. Append in the GEKit* Object you need
 ![Use the File > Append menu to load in Library objects to your scene](Docs/useLibrary.png)
-
-2. Configure Behavior from the Logic Editor
+3. Configure Behavior from the Logic Editor:
 ![Use the game property panel in the Logic Editor to adjust parameters](Docs/useLogicProperties.png)
 
 ---
