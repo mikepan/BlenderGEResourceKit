@@ -15,6 +15,7 @@ Free for Commercial and Non-commercial use.
 #### To use Library Components:
 
 1. Copy the GEKit folder to the same folder as your .blend file.
+![Copy GEKit script Folder into Your project](Docs/copyGEKit.png)
 2. Append in the GEKit* Object you need
 ![Use the File > Append menu to load in Library objects to your scene](Docs/useLibrary.png)
 3. Configure Behavior from the Logic Editor:
