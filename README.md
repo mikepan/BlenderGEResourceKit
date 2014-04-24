@@ -24,9 +24,14 @@ Free for Commercial and Non-commercial use.
 ---
 
 #### The Templates contains:
-#### To use the Templates:
+- Basic empty template
+- FPS Template
+- RTS Template
+- Flythrough Template
 
+#### To use the Templates:
+1. Make a copy/fork of the template of your choosing as a basis for your own project.
 
 ---
-### Contributors:
+Additional contributions from:
 - [Martins Upitis](http://devlog-martinsh.blogspot.com)
