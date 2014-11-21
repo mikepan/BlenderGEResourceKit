@@ -3,7 +3,14 @@
 A collection of ready-to-use components and templates for the Blender Game Engine 2.7x created (mostly) by Mike Pan.
 Free for Commercial and Non-commercial use.
 
+Easy Material is an addon that helps you setup physically-plausible materials for the Blender Game Engine.
+
+![Easy Material screenshot](Docs/easyMaterial.png)
+
+
 #### The Library contains:
+- Addons
+  - EasyMaterial  
 - Scripted Cameras
   - First-person camera
   - Orbit camera
@@ -11,6 +18,7 @@ Free for Commercial and Non-commercial use.
 - Graphics
   - GLSL material shaders
   - 2DFilter postprocessing shaders (Color Processing, SSAO, Depth of Field)
+
 
 #### To use Library Components:
 
