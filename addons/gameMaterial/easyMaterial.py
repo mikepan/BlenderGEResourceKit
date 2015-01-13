@@ -118,24 +118,3 @@ class BLEasyMaterialCreate(bpy.types.Operator):
 			return {'CANCELLED'}
 
 
-
-
-
-
-def register():
-	bpy.utils.register_class(BLEasyMaterialCreate)
-
-
-def unregister():
-	bpy.utils.unregister_class(BLEasyMaterialCreate)
-
-
-def refresh():
-	try:
-		register()
-	except Exception as E:
-		print('re-registering')
-		print(E)
-		unregister()
-		register()
-

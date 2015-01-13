@@ -57,12 +57,12 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 					if text.isnumeric():
 						text = tex.name.split('.')[-2]
 					# enable/disable texture channel
-					split  = layout.split(percentage=0.15)
+					split  = layout.split(percentage=0.20)
 					split.prop(textureSlot, 'use', text=text)
 
 					# image browse control
 					split.template_ID(tex, "image", open="image.open")
-					split  = layout.split(percentage=0.15)
+					split  = layout.split(percentage=0.20)
 					
 					# empty
 					row = split.row()
@@ -110,28 +110,4 @@ class BLSettings(GamePanel, bpy.types.Panel):
 		obj = context.object
 
 		row = layout.row()
-		
-		
 
-		
-
-def register():
-	bpy.utils.register_class(BLEasyMaterial)
-	bpy.utils.register_class(BLEasyAsset)
-	bpy.utils.register_class(BLSettings)
-
-
-def unregister():
-	bpy.utils.unregister_class(BLEasyMaterial)
-	bpy.utils.unregister_class(BLEasyAsset)
-	bpy.utils.unregister_class(BLSettings)
-
-
-def refresh():
-	try:
-		register()
-	except ValueError:
-		print('Re-registering')
-		unregister()
-		register()
-	
