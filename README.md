@@ -1,23 +1,19 @@
-### Blender GE Resource Kit
+## Blender GE Resource Kit
 
-A collection of ready-to-use components and templates for the Blender Game Engine 2.7x created (mostly) by Mike Pan.
-Free for Commercial and Non-commercial use.
+A collection of ready-to-use components and templates for the Blender Game Engine 2.7x created (mostly) by Mike Pan. Free for Commercial and Non-commercial use.
 
-Easy Material is an addon that helps you setup physically-plausible materials for the Blender Game Engine.
+The Resource Kit contains:
 
-![Easy Material screenshot](Docs/easyMaterial.png)
-
-
-#### The Library contains:
 - Addons
-  - EasyMaterial  
-- Scripted Cameras
-  - First-person camera
-  - Orbit camera
-  - Third-person camera
-- Graphics
-  - GLSL material shaders
-  - 2DFilter postprocessing shaders (Color Processing, SSAO, Depth of Field)
+  - EasyMaterial
+- Library
+	- Scripted Cameras (first person, orbit, third person)
+	- Graphics (GLSL Shaders, 2D postprocessing filters)
+- Template
+	- Basic empty template
+	- FPS Template
+	- RTS Template
+	- Flythrough Template
 
 
 #### To use Library Components:
@@ -31,14 +27,9 @@ Easy Material is an addon that helps you setup physically-plausible materials fo
 
 ---
 
-#### The Templates contains:
-- Basic empty template
-- FPS Template
-- RTS Template
-- Flythrough Template
-
 #### To use the Templates:
 1. Make a copy/fork of the template of your choosing as a basis for your own project.
+2. Extend away!
 
 ---
 Additional contributions from:
