@@ -63,6 +63,7 @@ def createMaterial(context, name):
 	mtex.use_map_color_diffuse = False
 	mtex.use_map_color_spec = True
 	mtex.blend_type = 'COLOR'
+	mtex.use = False
 
 	# gloss map (gloss map grayscale)
 	mtex = mat.texture_slots.add()
@@ -88,6 +89,8 @@ def createMaterial(context, name):
 	mtex.diffuse_color_factor = 0.75
 	mtex.blend_type = 'MULTIPLY'
 
+	# set identity
+	mat['uberMaterial'] = True
 	return mat
 
 

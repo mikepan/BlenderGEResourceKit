@@ -1,16 +1,18 @@
 import bpy, imp
 
-from easyMaterial import easyMaterial
+from easyGame import easyMaterial
+from easyGame import easyAsset
 imp.reload(easyMaterial)
+imp.reload(easyAsset)
 
 
 bl_info = {
-	"name": "EasyMaterial for Game Engine",
+	"name": "Easy Games for Game Engine",
 	"author": "Mike Pan",
 	"version": (1, 0),
 	"blender": (2, 70, 0),
 	"location": "View3D > Tool Shelf > Easy Games Tab",
-	"description": "Easily creates physically plausible materials.",
+	"description": "Help make the game creation process less painful",
 	"warning": "",
 	"wiki_url": "",
 	"category": "Game Engine"
@@ -23,16 +25,14 @@ def register():
 	bpy.utils.register_class(BLEasyAsset)
 	bpy.utils.register_class(BLSettings)
 	bpy.utils.register_class(BLEasyMaterialCreate)
-	print('registered')
-
-
+	bpy.utils.register_class(BLEasyAssetCreate)
 
 def unregister():
 	bpy.utils.unregister_class(BLEasyMaterial)
 	bpy.utils.unregister_class(BLEasyAsset)
 	bpy.utils.unregister_class(BLSettings)
 	bpy.utils.unregister_class(BLEasyMaterialCreate)
-	print('unregistered')
+	bpy.utils.unregister_class(BLEasyAssetCreate)
 
 
 ###############################################################################
@@ -45,7 +45,7 @@ class GamePanel():
 
 	
 class BLEasyMaterial(GamePanel, bpy.types.Panel):
-	"""Creates a Panel in the Object properties window"""
+	"""Creates the EasyMaterial UI"""
 	bl_label = "Easy Material"
 	# bl_context = "objectmode"
 
@@ -67,7 +67,7 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 
 		# material datablock manager
 		row = layout.row()
-		layout.template_ID_preview(obj, "active_material", new="gr.matcreate")
+		layout.template_ID_preview(obj, "active_material", new="easy.matcreate")
 
 		# material editor
 		row = layout.row()
@@ -75,12 +75,11 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 			mat = materialSlot.material
 
 			# bail code
-			# xxx better error handling
 			if not mat:
 				continue
-			if mat.specular_shader != 'BLINN':
-				row.label('Warning: Not an Ubershader', icon='ERROR')
-				layout.active = False
+			if 'uberMaterial' not in mat:
+				row.label('Not an UberMaterial', icon='ERROR')
+				continue
 
 			# edit albedo
 			row = layout.row()
@@ -130,9 +129,13 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 
 
 class BLEasyAsset(GamePanel, bpy.types.Panel):
-	"""Creates a Panel in the Object properties window"""
+	"""Creates The Easy Asset Interface"""
 	bl_label = "Easy Asset"
 	bl_context = "objectmode"
+
+	# @classmethod
+	# def poll(self, context):
+	# 	return context.active_object
 
 
 	def draw(self, context):
@@ -140,6 +143,16 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		obj = context.object
 
 		row = layout.row()
+		row.label('Camera')
+		row = layout.row(align=True)
+		row.operator("easy.assetcreate", text='Create FPS Camera').arg = 'camera.fps'
+		row.operator("easy.assetcreate", text='Create Orbit Camera').arg = 'camera.orbit'
+
+		row = layout.row()
+		row.label('Light')
+		row = layout.row(align=True)
+		row.operator("easy.assetcreate", text='Create Light Cycle').arg = 'light.cycle'
+		row.operator("easy.assetcreate", text='Create Orbit Camera').arg = 'light.orbit'
 	
 
 
@@ -152,7 +165,6 @@ class BLSettings(GamePanel, bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		obj = context.object
-
 		row = layout.row()
 
 
@@ -160,7 +172,7 @@ class BLSettings(GamePanel, bpy.types.Panel):
 class BLEasyMaterialCreate(bpy.types.Operator):
 	"""Create an übershader"""
 	bl_label = "New UberMaterial"
-	bl_idname = 'gr.matcreate'
+	bl_idname = 'easy.matcreate'
 
 	def execute(self, context):
 		error = easyMaterial.sanityCheck(context)
@@ -173,3 +185,22 @@ class BLEasyMaterialCreate(bpy.types.Operator):
 			return {'CANCELLED'}
 
 
+class BLEasyAssetCreate(bpy.types.Operator):
+	"""Create an asset"""
+	bl_label = "New Asset"
+	bl_idname = 'easy.assetcreate'
+	bl_options = {'REGISTER', 'UNDO'}
+
+	arg = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		objType, option = self.arg.split('.')
+		if objType == 'camera':
+			easyAsset.createCamera(context, option)
+		else:
+			print('Unsupported Asset')
+
+
+		return {'FINISHED'}
+		self.report({'ERROR'}, error)
+		return {'CANCELLED'}
