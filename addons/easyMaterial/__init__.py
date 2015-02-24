@@ -1,19 +1,53 @@
-# This module sets up the user interface in Blender that
-# is used to manage the easyMaterial
+import bpy, imp
 
-import bpy
+from easyMaterial import easyMaterial
+imp.reload(easyMaterial)
+
+
+bl_info = {
+	"name": "EasyMaterial for Game Engine",
+	"author": "Mike Pan",
+	"version": (1, 0),
+	"blender": (2, 70, 0),
+	"location": "View3D > Tool Shelf > Easy Games Tab",
+	"description": "Easily creates physically plausible materials.",
+	"warning": "",
+	"wiki_url": "",
+	"category": "Game Engine"
+}
+
+
+
+def register():
+	bpy.utils.register_class(BLEasyMaterial)
+	bpy.utils.register_class(BLEasyAsset)
+	bpy.utils.register_class(BLSettings)
+	bpy.utils.register_class(BLEasyMaterialCreate)
+	print('registered')
+
+
+
+def unregister():
+	bpy.utils.unregister_class(BLEasyMaterial)
+	bpy.utils.unregister_class(BLEasyAsset)
+	bpy.utils.unregister_class(BLSettings)
+	bpy.utils.unregister_class(BLEasyMaterialCreate)
+	print('unregistered')
+
+
+###############################################################################
 
 
 class GamePanel():
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'TOOLS'
-	bl_category = "Game Resources"
+	bl_category = "Easy Games"
 
 	
 class BLEasyMaterial(GamePanel, bpy.types.Panel):
 	"""Creates a Panel in the Object properties window"""
 	bl_label = "Easy Material"
-	bl_context = "objectmode"
+	# bl_context = "objectmode"
 
 	@classmethod
 	def poll(self, context):
@@ -23,11 +57,13 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 		layout = self.layout
 		obj = context.object
 
+		# bail on wrong display mode
 		if context.scene.game_settings.material_mode != 'GLSL':
 			row = layout.row()
-			row.label('Warning: GLSL Shading is not enabled', icon='ERROR')
+			row.label('EasyMaterial requires GLSL mode', icon='ERROR')
 			row = layout.row()
 			row.prop(context.scene.game_settings, 'material_mode', text='')
+			return
 
 		# material datablock manager
 		row = layout.row()
@@ -39,6 +75,7 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 			mat = materialSlot.material
 
 			# bail code
+			# xxx better error handling
 			if not mat:
 				continue
 			if mat.specular_shader != 'BLINN':
@@ -49,8 +86,17 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 			row = layout.row()
 			row.prop(mat, 'diffuse_intensity', text='Albedo')
 	
+
+
+			metallicTextureSlot = None
 			for textureSlot in mat.texture_slots:
 				if textureSlot:
+					# bail code
+					if textureSlot.use_map_color_spec and textureSlot.blend_type == 'COLOR':
+						metallicTextureSlot = textureSlot
+						continue
+
+
 					row = layout.row()
 					tex = textureSlot.texture
 					text = tex.name.split('.')[-1]
@@ -74,15 +120,13 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 					if text == 'Nor':
 						split.prop(textureSlot, 'normal_factor', text='Factor')
 					if text == 'Gloss':
-						...
+						split.prop(textureSlot, 'default_value', text='Factor')
+						if metallicTextureSlot:
+							split.prop(metallicTextureSlot, 'use', text='Metallic')
+
+
 					if textureSlot.texture_coords == 'UV' and tex.image:
 						split.prop_search(textureSlot, "uv_layer", context.active_object.data, "uv_textures", text="")
-
-		# additional material controls
-		row = layout.row()
-		row.label('Metallic')
-		row = layout.row()
-		row.prop(mat, 'specular_color')
 
 
 class BLEasyAsset(GamePanel, bpy.types.Panel):
@@ -110,4 +154,22 @@ class BLSettings(GamePanel, bpy.types.Panel):
 		obj = context.object
 
 		row = layout.row()
+
+
+
+class BLEasyMaterialCreate(bpy.types.Operator):
+	"""Create an übershader"""
+	bl_label = "New UberMaterial"
+	bl_idname = 'gr.matcreate'
+
+	def execute(self, context):
+		error = easyMaterial.sanityCheck(context)
+		if not error:
+			mat = easyMaterial.createMaterial(context, 'uber')
+			easyMaterial.assignMaterial(context, mat)
+			return {'FINISHED'}
+		else:
+			self.report({'ERROR'}, error)
+			return {'CANCELLED'}
+
 

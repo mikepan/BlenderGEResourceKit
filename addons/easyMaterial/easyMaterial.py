@@ -2,7 +2,6 @@ import bpy
 
 def createMaterial(context, name):
 	mat = bpy.data.materials.new(name)
-	
 
 	# Diffuse with fresnel simulation
 	mat.use_diffuse_ramp = True
@@ -20,8 +19,8 @@ def createMaterial(context, name):
 
 	# specular
 	mat.specular_shader = 'BLINN'
-	mat.specular_intensity = 0.05
-	mat.specular_hardness = 511
+	mat.specular_intensity = 0.0
+	mat.specular_hardness = 1
 	mat.specular_ior = 10.0
 
 	# color map
@@ -54,21 +53,30 @@ def createMaterial(context, name):
 	mtex.blend_type = 'MULTIPLY'
 	mtex.use_map_color_spec = True
 
-	# gloss map
-	tex = bpy.data.textures.new(name+'.Gloss', type = 'IMAGE')
-	tex.use_alpha = False
+	# spec map (gloss map with color)
+	specTexture = bpy.data.textures.new(name+'.Gloss', type = 'IMAGE')
+	specTexture.use_alpha = False
 	mtex = mat.texture_slots.add()
-	mtex.texture = tex
+	mtex.texture = specTexture
+	mtex.texture_coords = 'UV'
+	mtex.uv_layer = 'UVMap'
+	mtex.use_map_color_diffuse = False
+	mtex.use_map_color_spec = True
+	mtex.blend_type = 'COLOR'
+
+	# gloss map (gloss map grayscale)
+	mtex = mat.texture_slots.add()
+	mtex.texture = specTexture
 	mtex.texture_coords = 'UV'
 	mtex.uv_layer = 'UVMap'
 	mtex.use_map_color_diffuse = False
 	mtex.use_map_specular = True
-	mtex.specular_factor = 100.0
+	mtex.specular_factor = 2.0
 	mtex.use_map_hardness = True 
-	mtex.hardness_factor = -1.0
+	mtex.hardness_factor = 2.0
 	mtex.use_rgb_to_intensity = True
 	mtex.use_stencil = True
-	mtex.default_value = 0.2
+	mtex.default_value = 1.0
 	mtex.color = [1,1,1]
 
 	# reflection map
@@ -99,22 +107,4 @@ def sanityCheck(context):
 			if mat:
 				return 'Object already has materials, Aborted.'
 	return False
-
-
-class BLEasyMaterialCreate(bpy.types.Operator):
-	"""Create an übershader"""
-	bl_label = "New UberMaterial"
-	bl_idname = 'gr.matcreate'
-
-
-	def execute(self, context):
-		error = sanityCheck(context)
-		if not error:
-			mat = createMaterial(context, 'uber')
-			assignMaterial(context, mat)
-			return {'FINISHED'}
-		else:
-			self.report({'ERROR'}, error)
-			return {'CANCELLED'}
-
 
