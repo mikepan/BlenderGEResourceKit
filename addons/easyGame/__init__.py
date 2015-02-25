@@ -2,17 +2,18 @@ import bpy, imp
 
 from easyGame import easyMaterial
 from easyGame import easyAsset
+
 imp.reload(easyMaterial)
 imp.reload(easyAsset)
 
 
 bl_info = {
-	"name": "Easy Games for Game Engine",
+	"name": "Easy Games Collection",
 	"author": "Mike Pan",
 	"version": (1, 0),
 	"blender": (2, 70, 0),
 	"location": "View3D > Tool Shelf > Easy Games Tab",
-	"description": "Help make the game creation process less painful",
+	"description": "Help make the game-creation process simpler.",
 	"warning": "",
 	"wiki_url": "",
 	"category": "Game Engine"
@@ -23,14 +24,14 @@ bl_info = {
 def register():
 	bpy.utils.register_class(BLEasyMaterial)
 	bpy.utils.register_class(BLEasyAsset)
-	bpy.utils.register_class(BLSettings)
+	# bpy.utils.register_class(BLSettings)
 	bpy.utils.register_class(BLEasyMaterialCreate)
 	bpy.utils.register_class(BLEasyAssetCreate)
 
 def unregister():
 	bpy.utils.unregister_class(BLEasyMaterial)
 	bpy.utils.unregister_class(BLEasyAsset)
-	bpy.utils.unregister_class(BLSettings)
+	# bpy.utils.unregister_class(BLSettings)
 	bpy.utils.unregister_class(BLEasyMaterialCreate)
 	bpy.utils.unregister_class(BLEasyAssetCreate)
 
@@ -41,12 +42,13 @@ def unregister():
 class GamePanel():
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'TOOLS'
-	bl_category = "Easy Games"
 
 	
 class BLEasyMaterial(GamePanel, bpy.types.Panel):
 	"""Creates the EasyMaterial UI"""
 	bl_label = "Easy Material"
+	bl_category = "Easy Material"
+
 	# bl_context = "objectmode"
 
 	@classmethod
@@ -85,8 +87,6 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 			row = layout.row()
 			row.prop(mat, 'diffuse_intensity', text='Albedo')
 	
-
-
 			metallicTextureSlot = None
 			for textureSlot in mat.texture_slots:
 				if textureSlot:
@@ -94,7 +94,6 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 					if textureSlot.use_map_color_spec and textureSlot.blend_type == 'COLOR':
 						metallicTextureSlot = textureSlot
 						continue
-
 
 					row = layout.row()
 					tex = textureSlot.texture
@@ -123,7 +122,6 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 						if metallicTextureSlot:
 							split.prop(metallicTextureSlot, 'use', text='Metallic')
 
-
 					if textureSlot.texture_coords == 'UV' and tex.image:
 						split.prop_search(textureSlot, "uv_layer", context.active_object.data, "uv_textures", text="")
 
@@ -132,10 +130,11 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 	"""Creates The Easy Asset Interface"""
 	bl_label = "Easy Asset"
 	bl_context = "objectmode"
+	bl_category = "Easy Asset"
 
-	# @classmethod
-	# def poll(self, context):
-	# 	return context.active_object
+	@classmethod
+	def poll(self, context):
+		return True
 
 
 	def draw(self, context):
@@ -145,27 +144,35 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row()
 		row.label('Camera')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Create FPS Camera').arg = 'camera.fps'
-		row.operator("easy.assetcreate", text='Create Orbit Camera').arg = 'camera.orbit'
+		row.operator("easy.assetcreate", text='FPS Camera').arg = 'camera.fps'
+		row.operator("easy.assetcreate", text='Orbit Camera').arg = 'camera.orbit'
 
 		row = layout.row()
 		row.label('Light')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Create Light Cycle').arg = 'light.cycle'
-		row.operator("easy.assetcreate", text='Create Orbit Camera').arg = 'light.orbit'
+		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
+		row.operator("easy.assetcreate", text='Ambient Occlusion').arg = 'light.soft'
 	
-
-
-class BLSettings(GamePanel, bpy.types.Panel):
-	"""Creates a Panel in the Object properties window"""
-	bl_label = "Settings"
-	bl_context = "objectmode"
-
-
-	def draw(self, context):
-		layout = self.layout
-		obj = context.object
 		row = layout.row()
+		row.label('Effects')
+		row = layout.row(align=True)
+		row.operator("easy.assetcreate", text='Post-Processing 2D Filter').arg = 'post.main'
+		# row.operator("easy.assetcreate", text='Ambient Occlusion').arg = 'light.soft'
+
+		layout.template_list("UI_UL_list", "keying_sets", context.scene, "keying_sets", context.scene.keying_sets, "active_index", rows=1)
+
+
+
+# class BLSettings(GamePanel, bpy.types.Panel):
+# 	"""Creates a Panel in the Object properties window"""
+# 	bl_label = "Settings"
+# 	bl_context = "objectmode"
+#	bl_category = "Easy Settings"
+
+# 	def draw(self, context):
+# 		layout = self.layout
+# 		obj = context.object
+# 		row = layout.row()
 
 
 
@@ -196,7 +203,11 @@ class BLEasyAssetCreate(bpy.types.Operator):
 	def execute(self, context):
 		objType, option = self.arg.split('.')
 		if objType == 'camera':
-			easyAsset.createCamera(context, option)
+			easyAsset.createCamera(option)
+		elif objType == 'light':
+			easyAsset.createLight(option)
+		elif objType == 'post':
+			easyAsset.createPost(option)
 		else:
 			print('Unsupported Asset')
 

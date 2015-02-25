@@ -1,5 +1,8 @@
 import bpy
+
 from math import *
+import os
+
 
 def makeLogicBrick(obj, s, controller, a, pulse=True):
 	logic = bpy.ops.logic
@@ -30,7 +33,7 @@ def makeLogicBrick(obj, s, controller, a, pulse=True):
 	return sensorsList, actuatorsList
 
 
-def createCamera(context, option):
+def createCamera(option):
 	ops = bpy.ops
 
 	if option == 'fps':
@@ -38,7 +41,7 @@ def createCamera(context, option):
 	if option == 'orbit':
 		ops.object.empty_add(type='SPHERE')
 
-	obj = context.active_object
+	obj = bpy.context.active_object
 
 	# mouse look
 	sensors, actuators = makeLogicBrick(obj, 'ALWAYS', 'LOGIC_AND', 'MOUSE')
@@ -75,6 +78,27 @@ def createCamera(context, option):
 		parentObj = obj
 		ops.object.camera_add(rotation=(pi/2, 0,0), location=(0,0,0))
 		ops.transform.translate(value=(0,-10,0))
-		childObj = context.active_object
+		childObj = bpy.context.active_object
 		childObj.parent = parentObj
+		childObj.select = True
+		parentObj.select = True
 
+def createLight(option):
+	if option == 'cycle':
+		loadAsset('asset.blend', ('Cycle.Target', 'Cycle.Sun', 'Cycle.Fill'))
+
+
+def createPost(option):
+	loadAsset('2dfilters.blend', ('GEKit2DFilters'))
+
+
+def loadAsset(filename, objList):
+	scriptPath = os.path.realpath(__file__)
+	assetPath = os.path.join(os.path.dirname(scriptPath), 'asset', filename)
+
+	with bpy.data.libraries.load(assetPath)	as (data_from, data_to):
+		data_to.objects = data_from.objects
+
+	for obj in data_to.objects:
+		if obj.name in objList:
+			bpy.context.scene.objects.link(obj)
