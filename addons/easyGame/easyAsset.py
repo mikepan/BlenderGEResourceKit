@@ -73,6 +73,8 @@ def createCamera(option):
 		actuators[0].name = 'Right'
 		actuators[0].offset_location[0] = 0.2
 
+		obj.name = 'GECamera.FPS'
+
 	if option == 'orbit':
 		# add camera and parent
 		parentObj = obj
@@ -80,25 +82,64 @@ def createCamera(option):
 		ops.transform.translate(value=(0,-10,0))
 		childObj = bpy.context.active_object
 		childObj.parent = parentObj
+		bpy.ops.object.select_all(action='DESELECT')
 		childObj.select = True
 		parentObj.select = True
+		childObj.name = 'GECamera.Orbit'
+		parentObj.name = 'GECamera.Pivot'
+		bpy.context.scene.objects.active = parentObj
+
+
 
 def createLight(option):
+	error = None
+
 	if option == 'cycle':
-		loadAsset('asset.blend', ('Cycle.Target', 'Cycle.Sun', 'Cycle.Fill'))
+		error = checkExists('GECycle.Target')
+		if error: return error
+		error = checkExists('GECycle.Sun')
+		if error: return error
+		error = checkExists('GECycle.Fill')
+		if error: return error
+
+		error = loadAsset('asset.blend', ('GECycle.Target', 'GECycle.Sun', 'GECycle.Fill'))
+
+	return error
 
 
 def createPost(option):
-	loadAsset('2dfilters.blend', ('GEKit2DFilters'))
+	error = checkExists('GEKit2DFilter')
+	if error: return error
+
+	error = loadAsset('2dfilters.blend', ('GEKit2DFilter'))
+	return error
+
+
+def checkExists(name):
+	for obj in bpy.context.scene.objects:
+		if name in obj.name:
+			bpy.ops.object.select_all(action='DESELECT')
+			obj.select = True
+			bpy.context.scene.objects.active = obj
+			return obj.name + ' already exists. Aborted.'
+	return False
 
 
 def loadAsset(filename, objList):
+
 	scriptPath = os.path.realpath(__file__)
 	assetPath = os.path.join(os.path.dirname(scriptPath), 'asset', filename)
+	
+	try:
+		with bpy.data.libraries.load(assetPath)	as (data_from, data_to):
+			# data_to.objects = data_from.objects
+			data_to.objects = [name for name in data_from.objects if name in objList]
 
-	with bpy.data.libraries.load(assetPath)	as (data_from, data_to):
-		data_to.objects = data_from.objects
+	except:
+		return 'Asset file not found'
 
 	for obj in data_to.objects:
 		if obj.name in objList:
 			bpy.context.scene.objects.link(obj)
+
+	return False

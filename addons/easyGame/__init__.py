@@ -27,6 +27,7 @@ def register():
 	# bpy.utils.register_class(BLSettings)
 	bpy.utils.register_class(BLEasyMaterialCreate)
 	bpy.utils.register_class(BLEasyAssetCreate)
+	bpy.utils.register_class(BLAssetList)
 
 def unregister():
 	bpy.utils.unregister_class(BLEasyMaterial)
@@ -34,6 +35,8 @@ def unregister():
 	# bpy.utils.unregister_class(BLSettings)
 	bpy.utils.unregister_class(BLEasyMaterialCreate)
 	bpy.utils.unregister_class(BLEasyAssetCreate)
+	bpy.utils.unregister_class(BLAssetList)
+
 
 
 ###############################################################################
@@ -49,12 +52,6 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 	bl_label = "Easy Material"
 	bl_category = "Easy Material"
 
-	# bl_context = "objectmode"
-
-	@classmethod
-	def poll(self, context):
-		return context.active_object
-
 	def draw(self, context):
 		layout = self.layout
 		obj = context.object
@@ -65,6 +62,10 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 			row.label('EasyMaterial requires GLSL mode', icon='ERROR')
 			row = layout.row()
 			row.prop(context.scene.game_settings, 'material_mode', text='')
+			return
+
+		# bail on no object (We don't want to use poll because that hides the panel)
+		if not obj:
 			return
 
 		# material datablock manager
@@ -132,11 +133,6 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 	bl_context = "objectmode"
 	bl_category = "Easy Asset"
 
-	@classmethod
-	def poll(self, context):
-		return True
-
-
 	def draw(self, context):
 		layout = self.layout
 		obj = context.object
@@ -151,15 +147,17 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row.label('Light')
 		row = layout.row(align=True)
 		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
-		row.operator("easy.assetcreate", text='Ambient Occlusion').arg = 'light.soft'
+		row.operator("easy.assetcreate", text='Soft Light').arg = 'light.soft'
 	
 		row = layout.row()
 		row.label('Effects')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Post-Processing 2D Filter').arg = 'post.main'
-		# row.operator("easy.assetcreate", text='Ambient Occlusion').arg = 'light.soft'
+		row.operator("easy.assetcreate", text='Post-Processing 2D Filters').arg = 'post.main'
 
-		layout.template_list("UI_UL_list", "keying_sets", context.scene, "keying_sets", context.scene.keying_sets, "active_index", rows=1)
+		# template_list now takes two new args.
+		# The first one is the identifier of the registered UIList to use (if you want only the default list,
+		# with no custom draw code, use "UI_UL_list").
+		# layout.template_list("BLAssetList", "", obj, "material_slots", obj, "active_material_index")
 
 
 
@@ -203,15 +201,55 @@ class BLEasyAssetCreate(bpy.types.Operator):
 	def execute(self, context):
 		objType, option = self.arg.split('.')
 		if objType == 'camera':
-			easyAsset.createCamera(option)
+			error = easyAsset.createCamera(option)
 		elif objType == 'light':
-			easyAsset.createLight(option)
+			error = easyAsset.createLight(option)
 		elif objType == 'post':
-			easyAsset.createPost(option)
+			error = easyAsset.createPost(option)
 		else:
-			print('Unsupported Asset')
+			error = 'Sorry, not implemented yet.'
 
+		if error:
+			self.report({'ERROR'}, error)
+			return {'CANCELLED'}
+		else:
+			return {'FINISHED'}
+		
 
-		return {'FINISHED'}
-		self.report({'ERROR'}, error)
-		return {'CANCELLED'}
+class BLAssetList(bpy.types.UIList):
+	# The draw_item function is called for each item of the collection that is visible in the list.
+	#   data is the RNA object containing the collection,
+	#   item is the current drawn item of the collection,
+	#   icon is the "computed" icon for the item (as an integer, because some objects like materials or textures
+	#   have custom icons ID, which are not available as enum items).
+	#   active_data is the RNA object containing the active property for the collection (i.e. integer pointing to the
+	#   active item of the collection).
+	#   active_propname is the name of the active property (use 'getattr(active_data, active_propname)').
+	#   index is index of the current item in the collection.
+	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+		ob = data
+		slot = item
+		ma = slot.material
+		# draw_item must handle the three layout types... Usually 'DEFAULT' and 'COMPACT' can share the same code.
+		if self.layout_type in {'DEFAULT', 'COMPACT'}:
+			# You should always start your row layout by a label (icon + text), this will also make the row easily
+			# selectable in the list!
+			# We use icon_value of label, as our given icon is an integer value, not an enum ID.
+			layout.label(ma.name if ma else "", icon_value=icon)
+			# And now we can add other UI stuff...
+			# Here, we add nodes info if this material uses (old!) shading nodes.
+			if ma and not context.scene.render.use_shading_nodes:
+				manode = ma.active_node_material
+				if manode:
+					# The static method UILayout.icon returns the integer value of the icon ID "computed" for the given
+					# RNA object.
+					layout.label("Node %s" % manode.name, icon_value=layout.icon(manode))
+				elif ma.use_nodes:
+					layout.label("Node <none>")
+				else:
+					layout.label("")
+		# 'GRID' layout type should be as compact as possible (typically a single icon!).
+		elif self.layout_type in {'GRID'}:
+			layout.alignment = 'CENTER'
+			layout.label("", icon_value=icon)
+
