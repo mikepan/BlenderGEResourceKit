@@ -103,7 +103,13 @@ def createLight(option):
 		if error: return error
 
 		error = loadAsset('asset.blend', ('GECycle.Target', 'GECycle.Sun', 'GECycle.Fill'))
+	
+	if option == 'soft':
+		error = checkExists('GESoftLight')
+		if error: return error
 
+		error = loadAsset('asset.blend', ('GESoftLight.0', 'GESoftLight.1', 'GESoftLight.2', 'GESoftLight.3', 'GESoftLight.4'))
+	
 	return error
 
 
@@ -132,14 +138,12 @@ def loadAsset(filename, objList):
 	
 	try:
 		with bpy.data.libraries.load(assetPath)	as (data_from, data_to):
-			# data_to.objects = data_from.objects
 			data_to.objects = [name for name in data_from.objects if name in objList]
 
 	except:
 		return 'Asset file not found'
 
 	for obj in data_to.objects:
-		if obj.name in objList:
-			bpy.context.scene.objects.link(obj)
+		bpy.context.scene.objects.link(obj)
 
 	return False
