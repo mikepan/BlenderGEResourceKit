@@ -113,6 +113,11 @@ def createLight(option):
 	return error
 
 
+def createObj(option):
+	error = loadAsset('asset.blend', ('Mirror'))
+	return error
+
+
 def createPost(option):
 	error = checkExists('GEKit2DFilter')
 	if error: return error

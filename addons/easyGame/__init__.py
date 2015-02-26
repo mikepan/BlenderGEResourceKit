@@ -126,7 +126,7 @@ class BLEasyMaterial(GamePanel, bpy.types.Panel):
 					if textureSlot.texture_coords == 'UV' and tex.image:
 						split.prop_search(textureSlot, "uv_layer", context.active_object.data, "uv_textures", text="")
 
-
+	
 class BLEasyAsset(GamePanel, bpy.types.Panel):
 	"""Creates The Easy Asset Interface"""
 	bl_label = "Easy Asset"
@@ -148,7 +148,14 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row(align=True)
 		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
 		row.operator("easy.assetcreate", text='Soft Light').arg = 'light.soft'
-	
+		
+		row = layout.row()
+		row.label('Objects')
+		row = layout.row(align=True)
+		row.operator("easy.assetcreate", text='Plane Mirror').arg = 'obj.mirror'
+		# row.operator("easy.assetcreate", text='Orbit Camera').arg = 'camera.orbit'
+
+
 		row = layout.row()
 		row.label('Effects')
 		row = layout.row(align=True)
@@ -204,6 +211,8 @@ class BLEasyAssetCreate(bpy.types.Operator):
 			error = easyAsset.createCamera(option)
 		elif objType == 'light':
 			error = easyAsset.createLight(option)
+		elif objType == 'obj':
+			error = easyAsset.createObj(option)
 		elif objType == 'post':
 			error = easyAsset.createPost(option)
 		else:
