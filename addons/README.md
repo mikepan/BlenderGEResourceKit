@@ -19,12 +19,6 @@ Easy Asset helps you create common game assets such as first-person camera, day-
 
 The created assets as fully configurable from the Blender Properties Editor or Logic Editor.
 
- 
-![Easy Material screenshot](../Docs/easyMaterial.png)
-
-![Easy Material screenshot](../Docs/easyMaterial2.png)
-
- 
 
 **Want More?**
 
