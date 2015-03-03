@@ -8,11 +8,11 @@ imp.reload(easyAsset)
 
 
 bl_info = {
-	"name": "Easy Games Collection",
+	"name": "Easy Game Collection",
 	"author": "Mike Pan",
-	"version": (1, 0),
+	"version": (1, 2),
 	"blender": (2, 70, 0),
-	"location": "View3D > Tool Shelf > Easy Games Tab",
+	"location": "View3D > Tool Shelf > Easy Tabs",
 	"description": "Help make the game-creation process simpler.",
 	"warning": "",
 	"wiki_url": "",
