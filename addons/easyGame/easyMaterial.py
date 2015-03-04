@@ -17,6 +17,8 @@ def createMaterial(context, name):
 	# mat.diffuse_shader = 'MINNAERT'
 	# mat.darkness = 1.5
 
+	mat.alpha = 0.0
+
 	# specular
 	mat.specular_shader = 'BLINN'
 	mat.specular_intensity = 0.0
@@ -42,6 +44,28 @@ def createMaterial(context, name):
 	mtex.uv_layer = 'UVMap'
 	mtex.use_map_normal = True
 	mtex.use_map_color_diffuse = False
+
+	# alpha map
+	tex = bpy.data.textures.new(name+'.Alpha', type = 'IMAGE')
+	mtex = mat.texture_slots.add()
+	mtex.texture = tex
+	mtex.texture_coords = 'UV'
+	mtex.uv_layer = 'UVMap'
+	mtex.use_map_color_diffuse = False
+	mtex.use_map_alpha = True
+	mtex.use = False
+	
+
+	# emit map
+	tex = bpy.data.textures.new(name+'.Emit', type = 'IMAGE')
+	tex.use_alpha = False
+	mtex = mat.texture_slots.add()
+	mtex.texture = tex
+	mtex.texture_coords = 'UV'
+	mtex.uv_layer = 'UVMap'
+	mtex.use_map_color_diffuse = False
+	mtex.use_map_emit = True
+	mtex.use = False
 
 	# light map
 	tex = bpy.data.textures.new(name+'.AO', type = 'IMAGE')
@@ -108,6 +132,7 @@ def sanityCheck(context):
 			return 'Object is not a mesh, Aborted'
 		for mat in obj.data.materials:
 			if mat:
+				return False
 				return 'Object already has materials, Aborted.'
 	return False
 

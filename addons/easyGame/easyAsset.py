@@ -82,7 +82,6 @@ def createCamera(option):
 		ops.transform.translate(value=(0,-10,0))
 		childObj = bpy.context.active_object
 		childObj.parent = parentObj
-		bpy.ops.object.select_all(action='DESELECT')
 		childObj.select = True
 		parentObj.select = True
 		childObj.name = 'GECamera.Orbit'
@@ -129,7 +128,6 @@ def createPost(option):
 def checkExists(name):
 	for obj in bpy.context.scene.objects:
 		if name in obj.name:
-			bpy.ops.object.select_all(action='DESELECT')
 			obj.select = True
 			bpy.context.scene.objects.active = obj
 			return obj.name + ' already exists. Aborted.'
