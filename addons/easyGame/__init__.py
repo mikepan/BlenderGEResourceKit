@@ -229,14 +229,32 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row()
 		row.label('Create Objects')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Plane Mirror').arg = 'obj.mirror'
-		# row.operator("easy.assetcreate", text='Orbit Camera').arg = 'camera.orbit'
 
+		col = layout.column(align=True)
+		col.operator("easy.assetcreate", text='Barrel-Wood').arg = 'barrel.BarrelWood'
+		col.operator("easy.assetcreate", text='Barrel-Wood-Faded').arg = 'barrel.BarrelWood2'
+		col.operator("easy.assetcreate", text='Barrel-Blue').arg = 'barrel.BarrelOilBlue'
+		col.operator("easy.assetcreate", text='Barrel-Red').arg = 'barrel.BarrelOilRed'
+		col.operator("easy.assetcreate", text='Barrel-Red-Yellow').arg = 'barrel.BarrelOilRed2'
+		col.operator("easy.assetcreate", text='Barrel-Galvanized').arg = 'barrel.BarrelOilGalvanized'
+		
+		col = layout.column(align=True)
+		col.operator("easy.assetcreate", text='Concrete-Divider').arg = 'concrete.ConcreteDivider'
+		col.operator("easy.assetcreate", text='Concrete-Block1').arg = 'concrete.ConcreteBlock1'
+		col.operator("easy.assetcreate", text='Concrete-Block2').arg = 'concrete.ConcreteBlock2'
+		col.operator("easy.assetcreate", text='Concrete-Block3').arg = 'concrete.ConcreteBlock3'
 
 		row = layout.row()
 		row.label('Effects')
-		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Post-Processing 2D Filters').arg = 'post.main'
+		col = layout.column(align=True)
+		col.operator("easy.assetcreate", text='Plane Mirror').arg = 'fx.mirror'
+		row = layout.row()
+		row.operator("easy.assetcreate", text='Post-Processing 2D Filters').arg = 'fx.2DFilter'
+
+		col = layout.column(align=True)
+		col.operator("easy.assetcreate", text='Particles - Smoke').arg = 'fx.emitterSmoke'
+		col.operator("easy.assetcreate", text='Particles - Spark').arg = 'fx.emitterSpark'
+
 
 		row = layout.row()
 		
@@ -276,26 +294,33 @@ class BLEasyAssetCreate(bpy.types.Operator):
 	arg = bpy.props.StringProperty()
 	
 	def execute(self, context):
-		objType, option = self.arg.split('.')
 		
+		objType, option = self.arg.split('.')
+
 		# cleanup before we start
 		bpy.ops.object.select_all(action='DESELECT')
 
 		if objType == 'camera':
-			error = easyAsset.createCamera(option)
+			obj = easyAsset.createCamera(option)
 		elif objType == 'light':
-			error = easyAsset.createLight(option)
-		elif objType == 'obj':
-			error = easyAsset.createObj(option)
-		elif objType == 'post':
-			error = easyAsset.createPost(option)
+			obj = easyAsset.createLight(option)
+		elif objType == 'fx':
+			obj = easyAsset.createFX(option)
+		elif objType == 'barrel':
+			obj = easyAsset.createBarrel(option)
+		elif objType == 'concrete':
+			obj = easyAsset.createConcrete(option)
 		else:
-			error = 'Sorry, not implemented yet.'
+			obj = 'Sorry, not implemented yet.'
 
-		if error:
-			self.report({'ERROR'}, error)
+		if not obj:
+			self.report({'ERROR'}, 'something went wrong')
 			return {'CANCELLED'}
 		else:
+
+			obj.select = True
+			bpy.context.scene.objects.active = obj
+
 			return {'FINISHED'}
 		
 

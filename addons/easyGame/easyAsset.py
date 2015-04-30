@@ -4,35 +4,6 @@ from math import *
 import os
 
 
-def makeLogicBrick(obj, s, controller, a, pulse=True):
-	logic = bpy.ops.logic
-	sensorsList = []
-	actuatorsList = []
-
-	# create controller first
-	logic.controller_add(type=controller)
-	controller = obj.game.controllers[-1]
-
-	# add sensors
-	if type(s) is str: s = [s]
-	for i in s:
-		logic.sensor_add(type=i)
-		sensor = obj.game.sensors[-1]
-		sensor.use_pulse_true_level = pulse
-		sensor.link(controller)
-		sensorsList.append(sensor)	
-	
-	# add actuators
-	if type(a) is str: a = [a]
-	for i in a:
-		logic.actuator_add(type=i)
-		actuator = obj.game.actuators[-1]
-		actuator.link(controller)
-		actuatorsList.append(actuator)	
-
-	return sensorsList, actuatorsList
-
-
 def createCamera(option):
 	ops = bpy.ops
 
@@ -91,46 +62,60 @@ def createCamera(option):
 
 
 def createLight(option):
-	error = None
 
 	if option == 'cycle':
-		error = checkExists('GECycle.Target')
-		if error: return error
-		error = checkExists('GECycle.Sun')
-		if error: return error
-		error = checkExists('GECycle.Fill')
-		if error: return error
+		obj = checkExists('GECycle.Target')
+		if obj: return obj
+		obj = checkExists('GECycle.Sun')
+		if obj: return obj
+		obj = checkExists('GECycle.Fill')
+		if obj: return obj
 
-		error = loadAsset('asset.blend', ('GECycle.Target', 'GECycle.Sun', 'GECycle.Fill'))
+		obj = loadAsset('fx.blend', ('GECycle.Target', 'GECycle.Sun', 'GECycle.Fill'))
 	
 	if option == 'soft':
-		error = checkExists('GESoftLight')
-		if error: return error
+		obj = checkExists('GESoftLight')
+		if obj: return obj
 
-		error = loadAsset('asset.blend', ('GESoftLight.0', 'GESoftLight.1', 'GESoftLight.2', 'GESoftLight.3', 'GESoftLight.4'))
+		obj = loadAsset('fx.blend', ('GESoftLight.0', 'GESoftLight.1', 'GESoftLight.2', 'GESoftLight.3', 'GESoftLight.4'))
 	
-	return error
+	return obj
 
 
-def createObj(option):
-	error = loadAsset('asset.blend', ('Mirror'))
-	return error
+def createFX(option):
+	if option == '2DFilter':
+		obj = checkExists('2DFilter')
+		if obj: return obj
 
+	if option.startswith('emitter'):
+		obj = loadAsset('fx.blend', (option))
+		option = option.replace('emitter', 'particle')
+		objParticle = loadAsset('fx.blend', (option))
 
-def createPost(option):
-	error = checkExists('GEKit2DFilter')
-	if error: return error
+		layers = 20*[False]
+		layers[11] = True
+		for m in range(20):
+			objParticle.layers[m] = layers[m]
+		for m in range(20):							# sorry
+			objParticle.layers[m] = layers[m]
+		return obj
 
-	error = loadAsset('2dfilters.blend', ('GEKit2DFilter'))
-	return error
+	obj = loadAsset('fx.blend', (option))
+	return obj
+
+def createBarrel(option):
+	obj = loadAsset('barrels.blend', (option))
+	return obj
+
+def createConcrete(option):
+	obj = loadAsset('concrete.blend', (option))
+	return obj
 
 
 def checkExists(name):
 	for obj in bpy.context.scene.objects:
 		if name in obj.name:
-			obj.select = True
-			bpy.context.scene.objects.active = obj
-			return obj.name + ' already exists. Aborted.'
+			return obj
 	return False
 
 
@@ -149,4 +134,33 @@ def loadAsset(filename, objList):
 	for obj in data_to.objects:
 		bpy.context.scene.objects.link(obj)
 
-	return False
+	return obj
+
+
+def makeLogicBrick(obj, s, c, a, pulse=True):
+	logic = bpy.ops.logic
+	sensorsList = []
+	actuatorsList = []
+
+	# create controller first
+	logic.controller_add(type=c)
+	controller = obj.game.controllers[-1]
+
+	# add sensors
+	if type(s) is str: s = [s]
+	for i in s:
+		logic.sensor_add(type=i)
+		sensor = obj.game.sensors[-1]
+		sensor.use_pulse_true_level = pulse
+		sensor.link(controller)
+		sensorsList.append(sensor)	
+	
+	# add actuators
+	if type(a) is str: a = [a]
+	for i in a:
+		logic.actuator_add(type=i)
+		actuator = obj.game.actuators[-1]
+		actuator.link(controller)
+		actuatorsList.append(actuator)	
+
+	return sensorsList, actuatorsList
