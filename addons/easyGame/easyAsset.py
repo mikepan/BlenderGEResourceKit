@@ -46,6 +46,8 @@ def createCamera(option):
 
 		obj.name = 'GECamera.FPS'
 
+		return obj
+
 	if option == 'orbit':
 		# add camera and parent
 		parentObj = obj
@@ -57,7 +59,8 @@ def createCamera(option):
 		parentObj.select = True
 		childObj.name = 'GECamera.Orbit'
 		parentObj.name = 'GECamera.Pivot'
-		bpy.context.scene.objects.active = parentObj
+
+		return parentObj
 
 
 
@@ -92,20 +95,20 @@ def createFX(option):
 		option = option.replace('emitter', 'particle')
 		objParticle = loadAsset('fx.blend', (option))
 
+
 		layers = 20*[False]
-		layers[11] = True
-		for m in range(20):
-			objParticle.layers[m] = layers[m]
-		for m in range(20):							# sorry
-			objParticle.layers[m] = layers[m]
+		layers[19] = True
+		objParticle.layers = layers
 		return obj
 
 	obj = loadAsset('fx.blend', (option))
 	return obj
 
+
 def createBarrel(option):
 	obj = loadAsset('barrels.blend', (option))
 	return obj
+
 
 def createConcrete(option):
 	obj = loadAsset('concrete.blend', (option))
