@@ -225,11 +225,9 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row(align=True)
 		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
 		row.operator("easy.assetcreate", text='Soft Light').arg = 'light.soft'
-		
 		row = layout.row()
-		row.label('Create Objects')
-		row = layout.row(align=True)
 
+		row.label('Create Objects')
 		col = layout.column(align=True)
 		col.operator("easy.assetcreate", text='Barrel-Wood').arg = 'barrel.BarrelWood'
 		col.operator("easy.assetcreate", text='Barrel-Wood-Faded').arg = 'barrel.BarrelWood2'
@@ -243,8 +241,8 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		col.operator("easy.assetcreate", text='Concrete-Block1').arg = 'concrete.ConcreteBlock1'
 		col.operator("easy.assetcreate", text='Concrete-Block2').arg = 'concrete.ConcreteBlock2'
 		col.operator("easy.assetcreate", text='Concrete-Block3').arg = 'concrete.ConcreteBlock3'
-
 		row = layout.row()
+		
 		row.label('Effects')
 		col = layout.column(align=True)
 		col.operator("easy.assetcreate", text='Plane Mirror').arg = 'fx.mirror'
@@ -254,6 +252,7 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		col = layout.column(align=True)
 		col.operator("easy.assetcreate", text='Particles - Smoke').arg = 'fx.emitterSmoke'
 		col.operator("easy.assetcreate", text='Particles - Spark').arg = 'fx.emitterSpark'
+		col.operator("easy.assetcreate", text='Particles - Snow').arg = 'fx.emitterSnow'
 
 
 		row = layout.row()
