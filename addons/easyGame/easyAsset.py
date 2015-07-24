@@ -8,8 +8,12 @@ def createCamera(option):
 	ops = bpy.ops
 
 	if option == 'fps':
+		obj = checkExists('GECamera.FPS')
+		if obj: return obj
 		ops.object.camera_add(rotation=(pi/2, 0, 0))
 	if option == 'orbit':
+		obj = checkExists('GECamera.Pivot')
+		if obj: return obj
 		ops.object.empty_add(type='SPHERE')
 
 	obj = bpy.context.active_object
@@ -80,7 +84,7 @@ def createLight(option):
 		obj = checkExists('GESoftLight')
 		if obj: return obj
 
-		obj = loadAsset('fx.blend', ('GESoftLight.0', 'GESoftLight.1', 'GESoftLight.2', 'GESoftLight.3', 'GESoftLight.4'))
+		obj = loadAsset('fx.blend', ['GESoftLight.0', 'GESoftLight.1', 'GESoftLight.2', 'GESoftLight.3', 'GESoftLight.4'])
 	
 	return obj
 
@@ -91,9 +95,9 @@ def createFX(option):
 		if obj: return obj
 
 	if option.startswith('emitter'):
-		obj = loadAsset('fx.blend', (option))
+		obj = loadAsset('fx.blend', [option])
 		option = option.replace('emitter', 'particle')
-		objParticle = loadAsset('fx.blend', (option))
+		objParticle = loadAsset('fx.blend', [option])
 
 
 		layers = 20*[False]
@@ -101,17 +105,21 @@ def createFX(option):
 		objParticle.layers = layers
 		return obj
 
-	obj = loadAsset('fx.blend', (option))
+	obj = loadAsset('fx.blend', [option])
 	return obj
 
 
 def createBarrel(option):
-	obj = loadAsset('barrels.blend', (option))
+	obj = checkExists(option)
+	if obj: return obj
+	obj = loadAsset('barrels.blend', [option])
 	return obj
 
 
 def createConcrete(option):
-	obj = loadAsset('concrete.blend', (option))
+	obj = checkExists(option)
+	if obj: return obj
+	obj = loadAsset('concrete.blend', [option])
 	return obj
 
 
@@ -126,18 +134,19 @@ def loadAsset(filename, objList):
 
 	scriptPath = os.path.realpath(__file__)
 	assetPath = os.path.join(os.path.dirname(scriptPath), 'asset', filename)
-	
+
 	try:
 		with bpy.data.libraries.load(assetPath)	as (data_from, data_to):
 			data_to.objects = [name for name in data_from.objects if name in objList]
-
 	except:
 		return 'Asset file not found'
 
+	retObj = None
 	for obj in data_to.objects:
 		bpy.context.scene.objects.link(obj)
+		retObj = obj
 
-	return obj
+	return retObj
 
 
 def makeLogicBrick(obj, s, c, a, pulse=True):
