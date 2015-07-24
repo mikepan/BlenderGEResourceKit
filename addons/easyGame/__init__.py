@@ -69,15 +69,13 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row(align=True)
 		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
 		row.operator("easy.assetcreate", text='Soft Light').arg = 'light.soft'
+		
 		row = layout.row()
-
 		row.label('Effects:')
-		col = layout.column(align=True)
-		col.operator("easy.assetcreate", text='Plane Mirror').arg = 'fx.mirror'
-		row = layout.row()
+		row = layout.column(align=True)
+		row.operator("easy.assetcreate", text='Plane Mirror').arg = 'fx.mirror'
 		row.operator("easy.assetcreate", text='Post-Processing 2D Filters').arg = 'fx.2DFilter'
 
-		row = layout.row(align=True)
 		row.operator("easy.assetcreate", text='Particles - Smoke').arg = 'fx.emitterSmoke'
 		row.operator("easy.assetcreate", text='Particles - Spark').arg = 'fx.emitterSpark'
 		row.operator("easy.assetcreate", text='Particles - Snow').arg = 'fx.emitterSnow'
@@ -97,7 +95,9 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		col.operator("easy.assetcreate", text='Concrete-Block1').arg = 'concrete.ConcreteBlock1'
 		col.operator("easy.assetcreate", text='Concrete-Block2').arg = 'concrete.ConcreteBlock2'
 		col.operator("easy.assetcreate", text='Concrete-Block3').arg = 'concrete.ConcreteBlock3'
-		row = layout.row()
+
+		col = layout.column(align=True)
+		col.operator("easy.assetcreate", text='Wood-Pallet').arg = 'wood.Pallet'
 		
 		
 
@@ -319,6 +319,8 @@ class BLEasyAssetCreate(bpy.types.Operator):
 			obj = easyAsset.createBarrel(option)
 		elif objType == 'concrete':
 			obj = easyAsset.createConcrete(option)
+		elif objType == 'wood':
+			obj = easyAsset.createWood(option)
 		else:
 			obj = 'Sorry, not implemented yet.'
 

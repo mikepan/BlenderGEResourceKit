@@ -122,6 +122,12 @@ def createConcrete(option):
 	obj = loadAsset('concrete.blend', [option])
 	return obj
 
+def createWood(option):
+	obj = checkExists(option)
+	if obj: return obj
+	obj = loadAsset('wood.blend', [option])
+	return obj
+
 
 def checkExists(name):
 	for obj in bpy.context.scene.objects:
