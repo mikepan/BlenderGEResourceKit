@@ -61,24 +61,25 @@ class BLEasyAsset(GamePanel, bpy.types.Panel):
 		row = layout.row()
 		row.label('Camera:')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='FPS Camera').arg = 'camera.fps'
-		row.operator("easy.assetcreate", text='Orbit Camera').arg = 'camera.orbit'
+		row.operator("easy.assetcreate", text='FPS Camera', icon='OUTLINER_DATA_CAMERA').arg = 'camera.fps'
+		row.operator("easy.assetcreate", text='Orbit Camera', icon='OUTLINER_DATA_CAMERA').arg = 'camera.orbit'
 
 		row = layout.row()
 		row.label('Lights:')
 		row = layout.row(align=True)
-		row.operator("easy.assetcreate", text='Day-Night Cycle').arg = 'light.cycle'
-		row.operator("easy.assetcreate", text='Soft Light').arg = 'light.soft'
+		row.operator("easy.assetcreate", text='Day-Night Cycle', icon='LAMP_SUN').arg = 'light.cycle'
+		row.operator("easy.assetcreate", text='Soft Light', icon='LAMP_HEMI').arg = 'light.soft'
 		
 		row = layout.row()
 		row.label('Effects:')
 		row = layout.column(align=True)
-		row.operator("easy.assetcreate", text='Plane Mirror').arg = 'fx.mirror'
-		row.operator("easy.assetcreate", text='Post-Processing 2D Filters').arg = 'fx.2DFilter'
+		row.operator("easy.assetcreate", text='Plane Mirror', icon='MOD_MIRROR').arg = 'fx.mirror'
 
-		row.operator("easy.assetcreate", text='Particles - Smoke').arg = 'fx.emitterSmoke'
-		row.operator("easy.assetcreate", text='Particles - Spark').arg = 'fx.emitterSpark'
-		row.operator("easy.assetcreate", text='Particles - Snow').arg = 'fx.emitterSnow'
+		row.operator("easy.assetcreate", text='Particles - Smoke', icon='STICKY_UVS_DISABLE').arg = 'fx.emitterSmoke'
+		row.operator("easy.assetcreate", text='Particles - Spark', icon='PARTICLES').arg = 'fx.emitterSpark'
+		row.operator("easy.assetcreate", text='Particles - Snow', icon='FREEZE').arg = 'fx.emitterSnow'
+
+		row.operator("easy.assetcreate", text='Post-Processing 2D Filters', icon='TEXTURE' ).arg = 'fx.2DFilter'
 
 		row = layout.row()
 		row.label('Objects:')
